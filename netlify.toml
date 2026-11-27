@@ -1,13 +1,40 @@
+# There is no build step: site/ is already the finished site (tools/build.sh regenerates it from src/ by
+# hand). Netlify installs package.json's dependencies for the functions and publishes site/ as it is.
 [build]
   publish = "site"
 
+[functions]
+  node_bundler = "esbuild"
+
+# ---- the admin area ----
+# Each admin section has its own address (/admin/bookings, /admin/availability, …); all of them are the admin
+# page, which reads the section from the URL. This rewrite is not forced, so the real files in site/admin/
+# (index.html, admin.js, admin.css, …) are still served as themselves and only the section addresses fall
+# through to it.
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
+
+# ---- response headers ----
 [[headers]]
   for = "/vendor/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Keep the admin out of search results, out of frames and out of caches (it shows patient details).
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+    X-Frame-Options = "DENY"
 
 [[headers]]
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# /api/* and /media/* are routed by the `config.path` export in netlify/functions/*.mjs, and the /v8/ pages by
+# the one in netlify/edge-functions/pages.mjs. There is nothing to declare here for them.

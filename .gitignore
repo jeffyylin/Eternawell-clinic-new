@@ -5,4 +5,5 @@ hello_world_extension/
 .claude/
 .dev.vars
 .wrangler/
+.netlify/
 node_modules/

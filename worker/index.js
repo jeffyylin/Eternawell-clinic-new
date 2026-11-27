@@ -1,3 +1,7 @@
+// NOT IN USE. The site runs on Netlify now: see netlify/functions/api.mjs (the booking and admin API),
+// netlify/lib/store.mjs (storage) and netlify/edge-functions/pages.mjs (the /v8/ pages). This file and
+// wrangler.jsonc are kept only so the Cloudflare version can be deployed again if needed; nothing reads them.
+//
 // EternaWell Medicine on Cloudflare: serves the static site in site/, plus
 //  - online booking (public API) with availability rules the doctor controls,
 //  - an admin area (/admin/) where the doctor edits site text and photos and manages bookings.

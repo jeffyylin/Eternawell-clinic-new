@@ -1,0 +1,14 @@
+{
+  "name": "eternawell-new",
+  "private": true,
+  "description": "EternaWell Medicine website, booking and admin, on Netlify",
+  "scripts": {
+    "test": "npm run test:render && npm run test:api && npm run test:i18n",
+    "test:render": "node tools/test-render.mjs",
+    "test:api": "node --import ./tools/use-blobs-stub.mjs tools/test-api.mjs",
+    "test:i18n": "node tools/test-i18n.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.2.0"
+  }
+}

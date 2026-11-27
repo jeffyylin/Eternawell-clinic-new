@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · EternaWell Medicine</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin/admin.css">
+<script src="/admin/i18n.js"></script>
+</head>
+<body>
+<a class="skip" href="#main" data-i="skip">Skip to content</a>
+
+<!-- Sign in -->
+<main id="login" class="login" hidden>
+  <form class="login-card" id="login-form">
+    <div class="login-top"><p class="brand">EternaWell<span>Medicine</span></p><button type="button" class="lang-toggle" data-i="lang.btn" data-i-aria="lang.aria">中文</button></div>
+    <h1 data-i="login.title">Admin sign in</h1>
+    <label class="field"><span data-i="login.password">Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+    <p class="error" role="alert"></p>
+    <button class="btn" type="submit" data-i="login.submit">Sign in</button>
+    <p class="muted"><a href="/v8/" data-i="login.back">Back to the website</a></p>
+  </form>
+</main>
+
+<!-- Not configured -->
+<main id="setup" class="login" hidden>
+  <div class="login-card">
+    <div class="login-top"><p class="brand">EternaWell<span>Medicine</span></p><button type="button" class="lang-toggle" data-i="lang.btn" data-i-aria="lang.aria">中文</button></div>
+    <h1 data-i="setup.title">Admin isn't set up yet</h1>
+    <p data-i-html="setup.body"></p>
+  </div>
+</main>
+
+<!-- App -->
+<div id="app" hidden>
+  <header class="top">
+    <p class="brand">EternaWell<span data-i="brand.admin">Admin</span></p>
+    <nav class="tabs" data-i-aria="nav.aria" aria-label="Admin sections">
+      <button type="button" data-tab="bookings" aria-current="page" data-i="tab.bookings">Bookings</button>
+      <button type="button" data-tab="messages"><span data-i="tab.messages">Messages</span> <span class="badge" id="unread" hidden></span></button>
+      <button type="button" data-tab="website" data-i="tab.website">Edit website</button>
+      <button type="button" data-tab="availability" data-i="tab.availability">Availability</button>
+      <button type="button" data-tab="clinic" data-i="tab.clinic">Clinic details</button>
+    </nav>
+    <div class="top-end">
+      <button type="button" class="lang-toggle" data-i="lang.btn" data-i-aria="lang.aria">中文</button>
+      <a href="/v8/" target="_blank" rel="noopener"><span data-i="top.view">View site</span><span class="visually-hidden" data-i="top.newtab"> (opens in a new tab)</span></a>
+      <button type="button" class="link" id="logout" data-i="top.logout">Sign out</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Bookings -->
+    <section class="panel" data-panel="bookings">
+      <div class="panel-head">
+        <h1 data-i="tab.bookings">Bookings</h1>
+        <div class="row">
+          <div class="seg" role="group" data-i-aria="show">
+            <button type="button" data-view="upcoming" aria-pressed="true" data-i="view.upcoming">Upcoming</button>
+            <button type="button" data-view="past" aria-pressed="false" data-i="view.past">Past</button>
+            <button type="button" data-view="cancelled" aria-pressed="false" data-i="view.cancelled">Cancelled</button>
+            <button type="button" data-view="all" aria-pressed="false" data-i="view.all">All</button>
+          </div>
+          <button type="button" class="btn ghost" id="export" data-i="bk.export">Download CSV</button>
+          <button type="button" class="btn" id="add-booking" data-i="bk.add">Add booking</button>
+        </div>
+      </div>
+      <form class="card add-form" id="add-form" hidden>
+        <h2 data-i="bk.addTitle">Add a booking</h2>
+        <p class="muted" data-i="bk.addHint"></p>
+        <div class="grid">
+          <label class="field"><span data-i="f.date">Date</span><input type="date" name="date" required></label>
+          <label class="field"><span data-i="f.time">Time</span><input type="time" name="time" step="300" required></label>
+          <label class="field"><span data-i="f.type">Visit type</span><select name="type"></select></label>
+          <label class="field"><span data-i="f.mode">Visit</span><select name="mode"><option value="in-person" data-i="mode.in">In person</option><option value="telemedicine" data-i="mode.tele">Telemedicine</option></select></label>
+          <label class="field"><span data-i="f.name">Patient name</span><input name="name" required></label>
+          <label class="field"><span data-i="f.phone">Phone</span><input name="phone" type="tel" required></label>
+          <label class="field"><span data-i="f.email">Email (optional)</span><input name="email" type="email"></label>
+          <label class="field wide"><span data-i="f.note">Note (optional, no medical details)</span><input name="note"></label>
+        </div>
+        <p class="error" role="alert"></p>
+        <div class="row"><button class="btn" type="submit" data-i="bk.save">Save booking</button><button class="btn ghost" type="button" id="add-cancel" data-i="cancel">Cancel</button></div>
+      </form>
+      <p class="status" id="bookings-status" aria-live="polite"></p>
+      <div id="bookings"></div>
+    </section>
+
+    <!-- Messages -->
+    <section class="panel" data-panel="messages" hidden>
+      <div class="panel-head">
+        <h1 data-i="msg.title">Messages</h1>
+        <div class="seg" role="group" data-i-aria="show">
+          <button type="button" data-mview="all" aria-pressed="true" data-i="view.all">All</button>
+          <button type="button" data-mview="new" aria-pressed="false" data-i="msg.unreadView">Unread</button>
+          <button type="button" data-mview="read" aria-pressed="false" data-i="msg.readView">Read</button>
+        </div>
+      </div>
+      <p class="hint" data-i="msg.hint"></p>
+      <p class="status" id="messages-status" aria-live="polite"></p>
+      <ul class="mlist" id="messages"></ul>
+    </section>
+
+    <!-- Website editor -->
+    <section class="panel" data-panel="website" hidden>
+      <div class="panel-head">
+        <h1 data-i="web.title">Edit website</h1>
+        <div class="row">
+          <div class="field inline"><span data-i="web.siteLang">Website language</span>
+            <div class="seg" role="group" id="site-lang" data-i-aria="web.siteLang">
+              <button type="button" data-site="en" aria-pressed="true">English</button>
+              <button type="button" data-site="zh" aria-pressed="false" lang="zh-Hans">中文</button>
+            </div>
+          </div>
+          <label class="field inline"><span data-i="web.page">Page</span><select id="page"></select></label>
+          <button type="button" class="btn ghost" id="discard" disabled data-i="web.discard">Discard changes</button>
+          <button type="button" class="btn" id="save" disabled>Save changes</button>
+        </div>
+      </div>
+      <p class="hint" data-i-html="web.hint"></p>
+      <p class="status" id="edit-status" aria-live="polite"></p>
+      <div class="frame-wrap"><iframe id="editor" data-i-title="web.frame" title="Website page in editing mode"></iframe></div>
+      <details class="card edited">
+        <summary><span data-i="web.edited">Edited items</span> <span id="edited-count"></span></summary>
+        <p class="muted" data-i="web.editedHint"></p>
+        <ul id="edited-list"></ul>
+      </details>
+    </section>
+
+    <!-- Availability -->
+    <section class="panel" data-panel="availability" hidden>
+      <div class="panel-head">
+        <h1 data-i="av.title">Availability</h1>
+        <div class="seg" role="group" id="av-view" data-i-aria="av.viewAria">
+          <button type="button" data-av="schedule" aria-pressed="true" data-i="av.vSchedule">Schedule</button>
+          <button type="button" data-av="settings" aria-pressed="false" data-i="av.vSettings">Settings</button>
+        </div>
+      </div>
+      <p class="status" id="avail-status" aria-live="polite"></p>
+      <div class="av-pane" data-avpane="schedule">
+        <div class="card sched-card" id="schedule">
+          <div class="sched-head">
+            <h2 data-i="sc.title">Schedule</h2>
+            <div class="row sched-nav">
+              <button type="button" class="btn ghost sm" id="sc-today" data-i="sc.today">Today</button>
+              <button type="button" class="nav" id="sc-prev" data-i-aria="sc.prev">‹</button>
+              <b id="sc-range" aria-live="polite"></b>
+              <button type="button" class="nav" id="sc-next" data-i-aria="sc.next">›</button>
+              <button type="button" class="btn" id="sc-new" data-i="sc.block">Block time</button>
+            </div>
+          </div>
+          <p class="muted" data-i="sc.hint"></p>
+          <form class="sc-form" id="sc-form" hidden>
+            <h3 data-i="sc.formTitle">Block time</h3>
+            <div class="sc-when">
+              <label class="field"><span data-i="sc.starts">Starts</span><input type="date" id="sc-date" required></label>
+              <label class="field sc-timed"><span class="visually-hidden" data-i="hb.from">From</span><input type="time" id="sc-start" step="900" value="12:00"></label>
+              <span class="sc-dash" aria-hidden="true">–</span>
+              <label class="field sc-timed"><span class="visually-hidden" data-i="hb.until">Until</span><input type="time" id="sc-end" step="900" value="13:00"></label>
+              <label class="field"><span data-i="sc.ends">Ends</span><input type="date" id="sc-last" required></label>
+            </div>
+            <label class="check"><input type="checkbox" id="sc-allday"><span data-i="sc.allDay">All day</span></label>
+            <div class="sc-repeat">
+              <label class="field"><span data-i="hb.repeat">Repeat</span>
+                <select id="sc-repeat">
+                  <option value="none" data-i="sc.noRepeat">Does not repeat</option>
+                  <option value="daily" data-i="sc.daily">Daily</option>
+                  <option value="weekdays" data-i="sc.weekdays">Every weekday (Monday to Friday)</option>
+                  <option value="weekly" id="sc-weekly-opt">Weekly</option>
+                </select>
+              </label>
+              <label class="field" id="sc-until-wrap" hidden><span data-i="sc.repeatUntil">Repeat until</span><input type="date" id="sc-until"></label>
+            </div>
+            <p class="muted sc-summary" id="sc-summary" aria-live="polite"></p>
+            <p class="error" id="sc-error" role="alert"></p>
+            <div class="row"><button type="submit" class="btn" data-i="sc.save">Block</button><button type="button" class="btn ghost" id="sc-cancel" data-i="cancel">Cancel</button></div>
+          </form>
+          <div class="sc-scroll"><div class="sc-grid" id="sc-grid"></div></div>
+          <p class="legend"><span class="k k-book"></span><span data-i="sc.kBooking">Booking</span> <span class="k k-block"></span><span data-i="sc.kBlocked">Blocked</span> <span class="k k-google"></span><span data-i="sc.kGoogle">Busy in Google Calendar</span> <span class="k k-apple"></span><span data-i="sc.kApple">Apple Calendar event</span> <span class="k k-feed"></span><span data-i="sc.kFeed">Calendar link event</span> <span class="k k-closed"></span><span data-i="sc.kClosed">Closed</span></p>
+          <div class="sc-pop" id="sc-pop" role="dialog" aria-modal="false" hidden></div>
+        </div>
+      </div>
+      <div class="cols av-pane" data-avpane="settings" hidden>
+        <div class="card">
+          <h2 data-i="av.hours">Weekly hours</h2>
+          <p class="muted" data-i="av.hoursHint"></p>
+          <div id="hours"></div>
+        </div>
+        <div class="card">
+          <h2 data-i="av.types">Visit types</h2>
+          <p class="muted" data-i="av.typesHint"></p>
+          <div id="types"></div>
+          <button type="button" class="btn ghost" id="add-type" data-i="av.addType">Add visit type</button>
+        </div>
+        <div class="card">
+          <h2 data-i="av.rules">Booking rules</h2>
+          <div class="grid">
+            <label class="field"><span data-i="av.step"></span><input type="number" id="slotStep" min="5" max="240"></label>
+            <label class="field"><span data-i="av.buffer"></span><input type="number" id="bufferMinutes" min="0" max="120"></label>
+            <label class="field"><span data-i="av.notice"></span><input type="number" id="minNoticeHours" min="0" max="336"></label>
+            <label class="field"><span data-i="av.ahead"></span><input type="number" id="maxDaysAhead" min="1" max="365"></label>
+            <label class="field wide"><span data-i="av.retention"></span><input type="number" id="retentionDays" min="30" max="3650"></label>
+          </div>
+        </div>
+        <div class="av-cals">
+          <h2 class="av-group" data-i="av.calendars">Connected calendars</h2>
+          <div class="card" id="google">
+            <h2 data-i="g.title">Google Calendar</h2>
+            <p class="muted" data-i="g.hint"></p>
+            <p class="g-status" id="g-status" aria-live="polite"></p>
+            <div class="g-share" id="g-share" hidden>
+              <p class="muted" data-i-html="g.shareHint"></p>
+              <p class="row"><code id="g-email"></code><button type="button" class="btn ghost sm" id="g-copy" data-i="g.copy">Copy</button></p>
+            </div>
+            <div class="g-cals" id="g-cals"></div>
+            <button type="button" class="btn ghost sm g-addcal" id="g-addcal" data-i="g.addCal">Add a calendar</button>
+            <label class="field"><span data-i="g.bookingCal">Add new bookings to</span><select id="g-booking"></select></label>
+            <label class="field"><span data-i="g.detail"></span>
+              <select id="g-detail">
+                <option value="minimal" data-i="g.minimal"></option>
+                <option value="full" data-i="g.full"></option>
+              </select>
+            </label>
+            <p class="muted" data-i="g.hipaa"></p>
+            <div class="row">
+              <button type="button" class="btn ghost" id="g-sync" data-i="g.sync">Add upcoming bookings to calendar</button>
+            </div>
+            <p class="status" id="g-result" aria-live="polite"></p>
+            <p class="muted" data-i-html="g.saveNote"></p>
+          </div>
+          <div class="card" id="apple">
+            <h2 data-i="ap.title">Apple Calendar (iCloud)</h2>
+            <p class="muted" data-i="ap.hint"></p>
+            <p class="g-status" id="ap-status" aria-live="polite"></p>
+            <details class="ap-setup" id="ap-setup">
+              <summary data-i="ap.setupTitle">How to connect</summary>
+              <ol data-i-html="ap.steps"></ol>
+            </details>
+            <div class="g-cals" id="ap-cals"></div>
+            <button type="button" class="btn ghost sm g-addcal" id="ap-find" data-i="ap.find">Find my calendars</button>
+            <label class="field"><span data-i="g.bookingCal">Add new bookings to</span><select id="ap-booking"></select></label>
+            <p class="muted" data-i="ap.privacy"></p>
+            <div class="row">
+              <button type="button" class="btn ghost" id="ap-sync" data-i="g.sync">Add upcoming bookings to calendar</button>
+            </div>
+            <p class="status" id="ap-result" aria-live="polite"></p>
+            <p class="muted" data-i-html="g.saveNote"></p>
+          </div>
+          <div class="card" id="feeds">
+            <h2 data-i="f.title">Calendar links (EZCall and others)</h2>
+            <p class="muted" data-i-html="f.hint"></p>
+            <p class="g-status" id="f-status" aria-live="polite"></p>
+            <div class="g-cals" id="f-list"></div>
+            <button type="button" class="btn ghost sm g-addcal" id="f-add" data-i="f.add">Add a calendar link</button>
+            <p class="muted" data-i-html="g.saveNote"></p>
+          </div>
+        </div>
+      </div>
+      <div class="save-bar" id="save-bar">
+        <p id="save-bar-msg" aria-live="polite" data-i="av.saveHint"></p>
+        <button type="button" class="btn" id="save-availability" data-i="av.save">Save availability</button>
+      </div>
+    </section>
+
+    <!-- Clinic details -->
+    <section class="panel" data-panel="clinic" hidden>
+      <div class="panel-head"><h1 data-i="cl.title">Clinic details</h1></div>
+      <form class="card narrow" id="clinic-form">
+        <p class="muted" data-i="cl.hint"></p>
+        <label class="field"><span data-i="cl.phone">Phone</span><input name="phone" required></label>
+        <label class="field"><span data-i="cl.a1">Address line 1</span><input name="address1" required></label>
+        <label class="field"><span data-i="cl.a2">City, state and ZIP</span><input name="address2" required></label>
+        <p class="status" aria-live="polite"></p>
+        <button class="btn" type="submit" data-i="cl.save">Save clinic details</button>
+      </form>
+    </section>
+  </main>
+</div>
+
+<script src="/admin/admin.js" defer></script>
+</body>
+</html>
